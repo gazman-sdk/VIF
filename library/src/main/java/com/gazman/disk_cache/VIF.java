@@ -3,8 +3,6 @@ package com.gazman.disk_cache;
 import android.content.Context;
 import android.os.Handler;
 import android.os.Looper;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.util.Log;
 
 import java.io.Closeable;
@@ -24,7 +22,7 @@ import java.util.concurrent.TimeUnit;
  */
 
 @SuppressWarnings({"unused", "WeakerAccess"})
-public class DiskCache {
+public class VIF {
 
     private ExecutorService executor = Executors.newSingleThreadExecutor();
     private File cacheDir;
@@ -42,7 +40,7 @@ public class DiskCache {
      * @param dbName  Database name to be used by the cache service
      * @param maxSize maximum cache size
      */
-    public DiskCache(@NonNull Context context, @NonNull String dbName, long maxSize) {
+    public VIF(Context context, String dbName, long maxSize) {
         this.context = context.getApplicationContext();
         this.maxSize = maxSize;
         cacheDb = new CacheDb(context, dbName);
@@ -65,7 +63,7 @@ public class DiskCache {
     }
 
     /**
-     * Add entry to the cache
+     * Asynchronously adds entry to the cache
      *
      * @param key         any String value will do, there is no restriction on the name
      * @param inputStream cache source, all the exceptions will be handled quietly
@@ -83,7 +81,7 @@ public class DiskCache {
      *                         and stream will be closed once the reading is complete
      * @param completeCallback will be called once the writing is complete
      */
-    public void put(final String key, final InputStream inputStream, @Nullable final Runnable completeCallback) {
+    public void put(final String key, final InputStream inputStream, final Runnable completeCallback) {
         executor.execute(new Runnable() {
             @Override
             public void run() {
@@ -231,19 +229,18 @@ public class DiskCache {
     }
 
     private void logErrorDeletingFile(File file) {
-        Log.e("DiskCache", "Error removing file " + file + ". Will retry on next reboot");
+        Log.e("VIF", "Error removing file " + file + ". Will retry on next reboot");
     }
 
     private boolean deleteFile(File file) {
         return !file.exists() || file.delete();
     }
 
-    @NonNull
     private File toFile(long k) {
         if (cacheDir == null) {
             cacheDir = context.getExternalCacheDir();
         }
-        return new File(cacheDir, k + ".vip");
+        return new File(cacheDir, k + ".vif");
     }
 
     private void removeKeys(List<Integer> keys) {
@@ -290,7 +287,7 @@ public class DiskCache {
      * Callback interface for retrieving the file
      */
     public interface FileCallback {
-        void onResult(@Nullable File file);
+        void onResult(File file);
     }
 
     /**
@@ -298,10 +295,10 @@ public class DiskCache {
      */
     public interface ParserCallback<T> {
 
-        T parse(@NonNull File file) throws Exception;
+        T parse(File file) throws Exception;
 
-        void onError(@NonNull Throwable e);
+        void onError(Throwable e);
 
-        void onResult(@Nullable T result);
+        void onResult(T result);
     }
 }

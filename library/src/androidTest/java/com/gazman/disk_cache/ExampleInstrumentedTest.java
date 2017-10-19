@@ -1,8 +1,6 @@
 package com.gazman.disk_cache;
 
 import android.content.Context;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.support.test.InstrumentationRegistry;
 import android.support.test.runner.AndroidJUnit4;
 
@@ -30,17 +28,17 @@ import static org.junit.Assert.fail;
 @RunWith(AndroidJUnit4.class)
 public class ExampleInstrumentedTest {
 
-    private DiskCache diskCache;
+    private VIF VIF;
 
     @Before
     public void setUp() {
         Context appContext = InstrumentationRegistry.getTargetContext();
-        diskCache = new DiskCache(appContext, "test_db_" + System.currentTimeMillis(), 1024 * 1024 * 2);
+        VIF = new VIF(appContext, "test_db_" + System.currentTimeMillis(), 1024 * 1024 * 2);
     }
 
     @After
     public void tearDown() {
-        diskCache.shutDownAndWait();
+        VIF.shutDownAndWait();
     }
 
     @Test
@@ -48,10 +46,10 @@ public class ExampleInstrumentedTest {
         final String message = "Hello there";
         ByteArrayInputStream inputStream = new ByteArrayInputStream(message.getBytes("UTF-8"));
 
-        diskCache.put("key1", inputStream);
-        diskCache.getAsObject("key1", new DiskCache.ParserCallback<String>() {
+        VIF.put("key1", inputStream);
+        VIF.getAsObject("key1", new VIF.ParserCallback<String>() {
             @Override
-            public String parse(@NonNull File file) throws IOException {
+            public String parse(File file) throws IOException {
                 FileInputStream fileInputStream = new FileInputStream(file);
                 byte[] buffer = new byte[fileInputStream.available()];
                 //noinspection ResultOfMethodCallIgnored
@@ -60,12 +58,12 @@ public class ExampleInstrumentedTest {
             }
 
             @Override
-            public void onError(@NonNull Throwable e) {
+            public void onError(Throwable e) {
                 fail(e.getMessage());
             }
 
             @Override
-            public void onResult(@Nullable String result) {
+            public void onResult(String result) {
                 assertEquals(message, result);
             }
         });
@@ -76,10 +74,10 @@ public class ExampleInstrumentedTest {
         final String message = "Hello there";
         final ByteArrayInputStream inputStream = new ByteArrayInputStream(message.getBytes("UTF-8"));
 
-        diskCache.put("key1", inputStream);
-        diskCache.getAsFile("key1", new DiskCache.FileCallback() {
+        VIF.put("key1", inputStream);
+        VIF.getAsFile("key1", new VIF.FileCallback() {
             @Override
-            public void onResult(@Nullable File file) {
+            public void onResult(File file) {
                 if (file != null) {
                     assertTrue(file.exists());
                 } else {
@@ -94,12 +92,12 @@ public class ExampleInstrumentedTest {
         final String message = "Hello there";
         ByteArrayInputStream inputStream = new ByteArrayInputStream(message.getBytes("UTF-8"));
 
-        diskCache.put("key1", inputStream);
-        diskCache.delete("key1");
+        VIF.put("key1", inputStream);
+        VIF.delete("key1");
 
-        diskCache.getAsObject("key1", new DiskCache.ParserCallback<String>() {
+        VIF.getAsObject("key1", new VIF.ParserCallback<String>() {
             @Override
-            public String parse(@NonNull File file) throws Exception {
+            public String parse(File file) throws Exception {
                 FileInputStream fileInputStream = new FileInputStream(file);
                 byte[] buffer = new byte[fileInputStream.available()];
                 //noinspection ResultOfMethodCallIgnored
@@ -108,12 +106,12 @@ public class ExampleInstrumentedTest {
             }
 
             @Override
-            public void onError(@NonNull Throwable e) {
+            public void onError(Throwable e) {
                 fail(e.getMessage());
             }
 
             @Override
-            public void onResult(@Nullable String result) {
+            public void onResult(String result) {
                 assertEquals(result, null);
             }
         });
@@ -121,19 +119,19 @@ public class ExampleInstrumentedTest {
 
     @Test
     public void testAutoDelete() throws Exception {
-        diskCache.put("object1", createObject(1024 * 1024));
-        diskCache.put("object2", createObject(1024 * 1024));
+        VIF.put("object1", createObject(1024 * 1024));
+        VIF.put("object2", createObject(1024 * 1024));
         validateObject("object1", false);
-        diskCache.put("object3", createObject(1024 * 1024));
+        VIF.put("object3", createObject(1024 * 1024));
         validateObject("object1", false);
         validateObject("object3", false);
         validateObject("object2", true);
     }
 
     private void validateObject(final String key, final boolean deleted) {
-        diskCache.getAsFile(key, new DiskCache.FileCallback() {
+        VIF.getAsFile(key, new VIF.FileCallback() {
             @Override
-            public void onResult(@Nullable File file) {
+            public void onResult(File file) {
                 assertEquals(key, deleted, file == null || !file.exists());
             }
         });
