@@ -71,7 +71,7 @@ class CacheDb {
     }
 
     List<Integer> getCorruptedFiles() {
-        return new QueryHelper<List<Integer>>(new ArrayList<Integer>()) {
+        return new QueryHelper<List<Integer>>(new ArrayList<>()) {
             @Override
             List<Integer> parse(Cursor cursor) {
                 ArrayList<Integer> list = new ArrayList<>();
@@ -103,14 +103,14 @@ class CacheDb {
     }
 
     List<Integer> getKeysToDelete(final long maxSize) {
-        return new QueryHelper<List<Integer>>(new ArrayList<Integer>()) {
+        return new QueryHelper<List<Integer>>(new ArrayList<>()) {
             @Override
             List<Integer> parse(Cursor cursor) {
                 ArrayList<Integer> list = new ArrayList<>();
                 long count = 0;
-                while (cursor.moveToNext()){
+                while (cursor.moveToNext()) {
                     count += cursor.getLong(1);
-                    if(count > maxSize){
+                    if (count > maxSize) {
                         list.add(cursor.getInt(0));
                     }
                 }

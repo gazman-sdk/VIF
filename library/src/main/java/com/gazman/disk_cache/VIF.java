@@ -44,12 +44,9 @@ public class VIF {
         this.context = context.getApplicationContext();
         this.maxSize = maxSize;
         cacheDb = new CacheDb(context, dbName);
-        executor.execute(new Runnable() {
-            @Override
-            public void run() {
-                removeKeys(cacheDb.getCorruptedFiles());
-                totalSize = cacheDb.getTotalSize();
-            }
+        executor.execute(() -> {
+            removeKeys(cacheDb.getCorruptedFiles());
+            totalSize = cacheDb.getTotalSize();
         });
     }
 
@@ -82,21 +79,18 @@ public class VIF {
      * @param completeCallback will be called once the writing is complete
      */
     public void put(final String key, final InputStream inputStream, final Runnable completeCallback) {
-        executor.execute(new Runnable() {
-            @Override
-            public void run() {
-                long k = cacheDb.prepareKey(key);
-                File file = toFile(k);
-                saveFile(key, file, inputStream);
-                long fileSize = file.length();
-                cacheDb.finalizeKey(k, fileSize);
-                totalSize += fileSize;
-                if (completeCallback != null) {
-                    handler.post(completeCallback);
-                }
-                if (totalSize > maxSize) {
-                    freeSpace();
-                }
+        executor.execute(() -> {
+            long k = cacheDb.prepareKey(key);
+            File file = toFile(k);
+            saveFile(key, file, inputStream);
+            long fileSize = file.length();
+            cacheDb.finalizeKey(k, fileSize);
+            totalSize += fileSize;
+            if (completeCallback != null) {
+                handler.post(completeCallback);
+            }
+            if (totalSize > maxSize) {
+                freeSpace();
             }
         });
     }
@@ -107,20 +101,17 @@ public class VIF {
      * @param key key to be deleted
      */
     public void delete(final String key) {
-        executor.execute(new Runnable() {
-            @Override
-            public void run() {
-                int k = cacheDb.prepareKey(key);
-                if (k == -1) {
-                    return;
-                }
-                totalSize = cacheDb.getTotalSize();
-                File file = toFile(k);
-                if (deleteFile(file)) {
-                    cacheDb.deleteKeys(Collections.singletonList(k));
-                } else {
-                    logErrorDeletingFile(file);
-                }
+        executor.execute(() -> {
+            int k = cacheDb.prepareKey(key);
+            if (k == -1) {
+                return;
+            }
+            totalSize = cacheDb.getTotalSize();
+            File file = toFile(k);
+            if (deleteFile(file)) {
+                cacheDb.deleteKeys(Collections.singletonList(k));
+            } else {
+                logErrorDeletingFile(file);
             }
         });
     }
@@ -134,18 +125,10 @@ public class VIF {
      * @param callback callback for fetching the file
      */
     public void getAsFile(final String key, final FileCallback callback) {
-        executor.execute(new Runnable() {
-            @Override
-            public void run() {
-                long k = cacheDb.getKey(key);
-                final File file = k != -1 ? toFile(k) : null;
-                handler.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        callback.onResult(file);
-                    }
-                });
-            }
+        executor.execute(() -> {
+            long k = cacheDb.getKey(key);
+            final File file = k != -1 ? toFile(k) : null;
+            handler.post(() -> callback.onResult(file));
         });
     }
 
@@ -159,40 +142,22 @@ public class VIF {
      * @param <T>      Result type
      */
     public <T> void getAsObject(final String key, final ParserCallback<T> callback) {
-        executor.execute(new Runnable() {
-            @Override
-            public void run() {
-                long k = cacheDb.getKey(key);
-                if (k == -1) {
-                    handler.post(new Runnable() {
-                        @Override
-                        public void run() {
-                            callback.onResult(null);
-                        }
-                    });
-                    return;
-                }
-                final File file = toFile(k);
-                final T result;
-                try {
-                    result = callback.parse(file);
-                    handler.post(new Runnable() {
-                        @Override
-                        public void run() {
-                            callback.onResult(result);
-                        }
-                    });
-                } catch (final Throwable e) {
-                    e.printStackTrace();
-                    handler.post(new Runnable() {
-                        @Override
-                        public void run() {
-                            callback.onError(e);
-                        }
-                    });
-                }
-
+        executor.execute(() -> {
+            long k = cacheDb.getKey(key);
+            if (k == -1) {
+                handler.post(() -> callback.onResult(null));
+                return;
             }
+            final File file = toFile(k);
+            final T result;
+            try {
+                result = callback.parse(file);
+                handler.post(() -> callback.onResult(result));
+            } catch (final Throwable e) {
+                e.printStackTrace();
+                handler.post(() -> callback.onError(e));
+            }
+
         });
     }
 
@@ -200,12 +165,9 @@ public class VIF {
      * Asynchronously shut down the cache, any request to the cache after this call may fail
      */
     public void shutDown() {
-        executor.execute(new Runnable() {
-            @Override
-            public void run() {
-                cacheDb.close();
-                cacheDb = null;
-            }
+        executor.execute(() -> {
+            cacheDb.close();
+            cacheDb = null;
         });
         executor.shutdown();
     }

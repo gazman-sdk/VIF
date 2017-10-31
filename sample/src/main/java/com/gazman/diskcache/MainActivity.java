@@ -14,7 +14,7 @@ import java.io.File;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
-public class MainActivity extends AppCompatActivity implements Runnable{
+public class MainActivity extends AppCompatActivity implements Runnable {
 
     public static final String URL = "https://lh3.googleusercontent.com/dWU6kgfEhlLIoVwmYXcOU_bQNzQQaymLsnfeiUuHBlcOTG-56ji0e3QZLV3GP_YtEdQ=w300";
     private VIF appCache;
