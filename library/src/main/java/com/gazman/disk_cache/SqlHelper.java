@@ -1,7 +1,7 @@
 package com.gazman.disk_cache;
 
 import android.content.Context;
-import android.database.sqlite.SQLiteDatabase;
+import io.requery.android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
 /**
