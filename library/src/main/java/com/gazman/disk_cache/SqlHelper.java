@@ -1,8 +1,9 @@
 package com.gazman.disk_cache;
 
 import android.content.Context;
-import io.requery.android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+
+import io.requery.android.database.sqlite.SQLiteDatabase;
 
 /**
  * Created by Ilya Gazman on 10/16/2017.

@@ -2,10 +2,11 @@ package com.gazman.disk_cache;
 
 import android.content.Context;
 import android.database.Cursor;
-import io.requery.android.database.sqlite.SQLiteDatabase;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import io.requery.android.database.sqlite.SQLiteDatabase;
 
 /**
  * Created by Ilya Gazman on 10/16/2017.
