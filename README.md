@@ -1,12 +1,13 @@
-VIF(Very Important Files) is LRU(Least Recently Used) disk cache library, with SqlLite journal. 
+VIF(Very Important Files) is LRU(Least Recently Used) disk cache library, with SqlLite journal.
 
 ### Features
 
- * Light library - No third party dependencies, 15.8KB size.
- * Corrupted files protection - It is guarantee that each time you access cache you will get non corrupted files
- * LRU memory management - When more memory needed least recently used files will be deleted first
- * Developers friendly - You can access both InputStream and File objects
- 
+* Light library - No third party dependencies, 15.8KB size.
+* Corrupted files protection - It is guarantee that each time you access cache you will get non
+  corrupted files
+* LRU memory management - When more memory needed least recently used files will be deleted first
+* Developers friendly - You can access both InputStream and File objects
+
 ### Usage
 
 ```Java
@@ -45,14 +46,15 @@ VIF(Very Important Files) is LRU(Least Recently Used) disk cache library, with S
     }
 ```
 
- * **VIF.put(String key, InputStream inputStream, Runnable callback)**: Asynchronously adds entry to the cache and call the optional callback on the main thread when complete
- * **VIF.delete(String key)**: Deletes the cache entry
- * **VIF.getAsFile(String key, FileCallback callback)**: Retrieve the cached entry as file
- * **VIF.getAsObject(String key, ParserCallback<T> callback)**: Retrieve the cached entry as an Object
- * **VIF.shutDown()**: Gracefully asynchronously shut down the cache
- * **VIF.shutDownAndWait()**: Gracefully synchronously shut down the cache
+* **VIF.put(String key, InputStream inputStream, Runnable callback)**: Asynchronously adds entry to
+  the cache and call the optional callback on the main thread when complete
+* **VIF.delete(String key)**: Deletes the cache entry
+* **VIF.getAsFile(String key, FileCallback callback)**: Retrieve the cached entry as file
+* **VIF.getAsObject(String key, ParserCallback<T> callback)**: Retrieve the cached entry as an
+  Object
+* **VIF.shutDown()**: Gracefully asynchronously shut down the cache
+* **VIF.shutDownAndWait()**: Gracefully synchronously shut down the cache
 
 ### License
-
 
 MIT
